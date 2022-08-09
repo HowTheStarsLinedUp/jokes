@@ -1,6 +1,7 @@
-.idea
+.idea/
 myTests/
 tmp/
 vendor/
+.gitignore
 cfg.php
 composer.lock
