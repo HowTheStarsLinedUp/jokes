@@ -1,0 +1,6 @@
+.idea
+myTests/
+tmp/
+vendor/
+cfg.php
+composer.lock
