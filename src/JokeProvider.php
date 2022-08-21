@@ -6,5 +6,6 @@ namespace App;
 
 interface JokeProvider
 {
-    public function getJokes(int $number) : array;
+    public function getJoke() : Joke;
+    public function getJokes(int $quantity) : array;
 }

@@ -2,6 +2,8 @@
 myTests/
 tmp/
 vendor/
-.gitignore
-cfg.php
-composer.lock
+.env
+.phpunit.result.cache
+jokes.json
+marks.json
+persons.json

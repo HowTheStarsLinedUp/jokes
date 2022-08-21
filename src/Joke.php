@@ -4,47 +4,37 @@ declare(strict_types=1);
 
 namespace App;
 
+use Exception;
 use JsonSerializable;
 
 class Joke implements JsonSerializable
 {
-    private string $id;
+    private string $sourceId;
     private string $text;
-    private string $category;
+    private ?string $category;
     private string $source;
-    
-    public function __construct(string $id, string $text, string $category, string $source)
+
+    /**
+     * @throws Exception
+     */
+    public function __construct(string $sourceId, string $text, ?string $category, string $source)
     {
-        $this->id = $id;
-        $this->text = $text;
+        if (empty($sourceId)) throw new Exception('Empty id string.');
+        else $this->sourceId = $sourceId;
+
+        if (empty($text)) throw new Exception('Empty text string.');
+        else $this->text = $text;
+
         $this->category = $category;
-        $this->source = $source;
-    }
-    
-    public function getJokeID() : int
-    {
-        return $this->id;
-    }
-    
-    public function getJokeText() : string
-    {
-        return $this->text;
-    }
-    
-    public function getJokeCategory() : string
-    {
-        return $this->category;
-    }
-    
-    public function getJokeSource() : string
-    {
-        return $this->source;
+
+        if (empty($source)) throw new Exception('Empty source string.');
+        else $this->source = $source;
     }
     
     public function jsonSerialize() : array
     {
         return [
-            'id' => $this->id,
+            'sourceId' => $this->sourceId,
             'text' => $this->text,
             'category' => $this->category,
             'source' => $this->source,

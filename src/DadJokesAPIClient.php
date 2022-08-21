@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\{BadResponseException, RequestException, ConnectException, TransferException, GuzzleException};
-use JsonException;
 use Exception;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 
-class DadJokesAPIClient implements JokeProvider
+class DadJokesApiClient implements JokeProvider
 {
+    private const SOURCE = 'dad-jokes.p.rapidapi.com';
     private Client $client;
     private string $apiKey;
 
@@ -21,15 +22,57 @@ class DadJokesAPIClient implements JokeProvider
     }
 
     /**
+     * @throws GuzzleException
+     * @throws JsonException
      * @throws Exception
      */
-    private function getJokesBy5(int $number = 5) : array
+    public function getJoke() : Joke
     {
-        if ($number > 5) throw new Exception('Too many jokes. Max 5.');
-        if ($number > 5) {
-            echo 'Too many jokes. Max 5.';
-            die();
-        };
+        $options = [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'X-RapidAPI-Key' => $this->apiKey,
+                'X-RapidAPI-Host' => 'dad-jokes.p.rapidapi.com',
+            ],
+        ];
+
+        $response = $this->client->request('GET', 'https://dad-jokes.p.rapidapi.com/random/joke', $options);
+        $joke = json_decode($response->getBody()->getContents(), true, flags: JSON_THROW_ON_ERROR);
+        $joke = $joke['body'][0];
+        $text = 'Setup: ' . $joke['setup'] . ' Punchline: ' . $joke['punchline'];
+
+        return new Joke($joke['_id'], $text, $joke['type'], DadJokesApiClient::SOURCE);
+    }
+
+    /**
+     * @throws Exception|GuzzleException
+     */
+    public function getJokes(int $quantity) : array
+    {
+        if ($quantity > 250) {
+            throw new Exception('Too many jokes. Max 250.');
+        }
+
+        // get jokes by count of $maxJokesByRequest and by $remainderRequestCount after;
+        $jokes = [];
+        $maxJokesByRequest = 5;
+        $fullRequestCount = intdiv($quantity, $maxJokesByRequest);
+        $remainderRequestCount = $quantity % $maxJokesByRequest;
+
+        for ($i = 0; $i < $fullRequestCount; $i++) {
+            array_push($jokes, ...$this->fetch($maxJokesByRequest));
+        }
+        array_push($jokes, ...$this->fetch($remainderRequestCount));
+
+        return $jokes;
+    }
+
+    /**
+     * @throws Exception|GuzzleException
+     */
+    private function fetch(int $jokesByRequest) : array
+    {
+        if ($jokesByRequest > 5) throw new Exception('Too many jokes. Max 5.');
 
         $jokes = [];
         $options = [
@@ -40,61 +83,19 @@ class DadJokesAPIClient implements JokeProvider
             ],
         ];
 
-        try {
-            $url = 'https://dad-jokes.p.rapidapi.com/random/joke?count=' . $number;
-            var_dump($url);
-            $response = $this->client->request('GET', $url, $options);
-            $joke = json_decode($response->getBody()->getContents(), true, flags: JSON_THROW_ON_ERROR);
+        $url = 'https://dad-jokes.p.rapidapi.com/random/joke?count=' . $jokesByRequest;
+        $response = $this->client->request('GET', $url, $options);
+        $dadJokes = json_decode($response->getBody()->getContents(), true, flags: JSON_THROW_ON_ERROR);
+        $dadJokes = $dadJokes['body'];
 
-            $dadJokes = $joke['body'];
-            echo 'в $dadJokes: ' . strval(count($dadJokes)) . PHP_EOL;
-            foreach ($dadJokes as $joke) {
-                $text = 'Setup: ' . $joke['setup'] . ' Punchline: ' . $joke['punchline'];
-                $myJoke = new Joke($joke['_id'], $text, $joke['type'], 'dad-jokes.p.rapidapi.com');
-                $jokes[] = $myJoke;
-            }
-            echo 'кількість: ' . strval($number) . PHP_EOL;
-            echo 'в масиві: ' . strval(count($jokes)) . PHP_EOL;
-        } catch (JsonException $e) {
-            echo 'JsonException' . PHP_EOL . $e->getMessage() . PHP_EOL;
-        } catch (BadResponseException $e) {
-            echo 'BadResponseException' . PHP_EOL . $e->getMessage() . PHP_EOL;
-        } catch (RequestException $e) {
-            echo 'RequestException' . PHP_EOL . $e->getMessage() . PHP_EOL;
-        } catch (ConnectException $e) {
-            echo 'ConnectException' . PHP_EOL . $e->getMessage() . PHP_EOL;
-        } catch (TransferException $e) {
-            echo 'TransferException' . PHP_EOL . $e->getMessage() . PHP_EOL;
-        } catch (GuzzleException $e) {
-            echo 'GuzzleException' . PHP_EOL . $e->getMessage() . PHP_EOL;
-        }
-
-        return $jokes;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getJokes(int $number) : array
-    {
-        if ($number > 250) {
-            throw new Exception('Too many jokes. Max 250.');
-        }
-
-        $jokes = [];
-        $by5 = intdiv($number, 5);
-        $remainder = $number % 5;
-        echo 'по 5: ' . strval($by5) . PHP_EOL;
-        echo 'залишок: ' . strval($remainder) . PHP_EOL;
-
-        for ($i = 0; $i < $by5; $i++) {
-            $jokes = array_merge($jokes, $this->getJokesBy5());
-        }
-        if ($remainder != 0) {
-            $jokes = array_merge($jokes, $this->getJokesBy5($remainder));
+        $count = 0;
+        foreach ($dadJokes as $dadJoke) {
+            $text = 'Setup: ' . $dadJoke['setup'] . ' Punchline: ' . $dadJoke['punchline'];
+            $jokes[] = new Joke($dadJoke['_id'], $text, $dadJoke['type'], DadJokesApiClient::SOURCE);
+            // there is dad-jokes api bug, when you get more than requested.
+            if (++$count > $jokesByRequest) break;
         }
 
         return $jokes;
     }
 }
-
