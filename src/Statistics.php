@@ -4,128 +4,110 @@ declare(strict_types=1);
 
 namespace App;
 
-use JsonMachine\Exception\InvalidArgumentException;
-use JsonMachine\Items;
-use JsonMachine\JsonDecoder\ExtJsonDecoder;
+use JsonException;
 
 class Statistics
 {
-//    перевірити при створенні джоука, чи не повторюється його айдішник
-
+    private array $marks;
 
     /**
-     * Return most popular joke with the highest number of marks.
-     * If there is more than one most popular joke it gets the last one.
-     * @throws InvalidArgumentException
+     * @throws JsonException
      */
-    public static function getMostPopularJokeId(string $marksFile) : string
+    public function __construct(string $marksFile)
     {
-        // read one mark from file by iteration.
-        $marks = Items::fromFile($marksFile, ['decoder' => new ExtJsonDecoder(true)]);
-        $markCountersByJoke = [];
-        foreach ($marks as $mark) {
+        $this->marks = json_decode(file_get_contents($marksFile), true, flags: JSON_THROW_ON_ERROR);
+    }
+
+    /**
+     * Return most popular joke IDs with the highest number of marks.
+     */
+    public function getMostPopularJokeId() : array
+    {
+        $markCountersPerJokeId = [];
+        foreach ($this->marks as $mark) {
             $jokeId = $mark['jokeId'];
-            // creating a hash table of joke IDs => marks count.
-            if (array_key_exists($jokeId, $markCountersByJoke)) {
-                $markCountersByJoke[$jokeId] += 1;
+            if (array_key_exists($jokeId, $markCountersPerJokeId)) {
+                $markCountersPerJokeId[$jokeId] += 1;
             } else {
-                $markCountersByJoke[$jokeId] = 1;
+                $markCountersPerJokeId[$jokeId] = 1;
             }
         }
 
-        $mostPopularJokeId = '';
-        $maxCounter = 0;
-        foreach ($markCountersByJoke as $id => $counter) {
-            if ($counter > $maxCounter) {
-                $maxCounter = $counter;
-                $mostPopularJokeId = $id;
-            }
-        }
-
-        return $mostPopularJokeId;
+        return array_keys($markCountersPerJokeId, max($markCountersPerJokeId));
     }
 
     /**
-     * Return average score per joke
-     * @throws InvalidArgumentException
+     * Return average mark per joke
      */
-    public static function getAvgMarkByJoke(string $marksFile) : array
+    public function getAvgMarkPerJoke() : array
     {
-        // read one mark from file by iteration.
-        $marks = Items::fromFile($marksFile, ['decoder' => new ExtJsonDecoder(true)]);
-        $marksByJoke = [];
-        foreach ($marks as $mark) {
-            $marksByJoke[ $mark['jokeId'] ][] = $mark['value'];
+        $marksPerJoke = [];
+        foreach ($this->marks as $mark) {
+            $marksPerJoke[ $mark['jokeId'] ][] = $mark['value'];
         }
 
-        foreach ($marksByJoke as &$jokeMarks) {
+        foreach ($marksPerJoke as &$jokeMarks) {
             $marksCount = count($jokeMarks);
-            if($marksCount) {
-                // make jokeMarks to be like jokeAverageMark
-                $jokeMarks = round(array_sum($jokeMarks)/$marksCount, 3, PHP_ROUND_HALF_DOWN);
-            }
+            // make jokeMarks to be a joke average mark
+            $jokeMarks = round(array_sum($jokeMarks)/$marksCount, 3, PHP_ROUND_HALF_DOWN);
         }
 
-        return $marksByJoke;
+        return $marksPerJoke;
     }
 
     /**
-     * Return the most successful joke with the highest average rating.
-     * @throws InvalidArgumentException
+     * Return the most successful joke IDs with the highest average rating.
      */
-    public static function getTopRatedJokeId(string $marksFile) : string
+    public function getTopRatedJokeId() : array
     {
-        $avgMarkByJoke = Statistics::getAvgMarkByJoke($marksFile);
+        $avgMarkPerJoke = $this->getAvgMarkPerJoke();
+        return array_keys($avgMarkPerJoke, max($avgMarkPerJoke));
+    }
 
-        $topRatedJokeId = '';
-        $maxMark = 0;
-        foreach ($avgMarkByJoke as $jokeId => $mark) {
-            if ($mark > $maxMark) {
-                $maxMark = $mark;
-                $topRatedJokeId = $jokeId;
-            }
-        }
+    /**
+     * Return the most low rated joke IDs with the lowest average rating.
+     */
+    public function getLowRatedJokeId() : array
+    {
+        $avgMarkPerJoke = $this->getAvgMarkPerJoke();
+        return array_keys($avgMarkPerJoke, min($avgMarkPerJoke));
+    }
 
-        return $topRatedJokeId;
+    /**
+     * Return joke IDs with average rating lower than $num.
+     */
+    public function getJokeIdsLowerThen(int $num) : array
+    {
+        $avgMarkPerJoke = $this->getAvgMarkPerJoke();
+        return array_keys($avgMarkPerJoke, array_filter($avgMarkPerJoke, fn($value) => $value < $num));
     }
 
     /**
      * Return the most successful joke with the highest average rating per month.
-     * @throws InvalidArgumentException
      */
-    public static function getTopRatedJokeIdPerMonth(string $marksFile) : array
+    public function getTopRatedJokeIdPerMonth() : array
     {
-        // read one mark from file by iteration.
-        $marks = Items::fromFile($marksFile, ['decoder' => new ExtJsonDecoder(true)]);
         $marksByJokePerMonth = [];
-        foreach ($marks as $mark) {
+        foreach ($this->marks as $mark) {
+            // [months][jokeIDs][marks]
             $marksByJokePerMonth[ date("m", $mark['timestamp']) ][ $mark['jokeId'] ][] = $mark['value'];
         }
 
-        foreach ($marksByJokePerMonth as &$marksByJoke) {
+        foreach ($marksByJokePerMonth as &$marksPerJoke) {
             // get average mark for every joke in month
-            foreach ($marksByJoke as &$jokeMarks) {
+            foreach ($marksPerJoke as &$jokeMarks) {
                 $marksCount = count($jokeMarks);
-                if($marksCount) {
-                    // make jokeMarks to be like jokeAverageMark
-                    $jokeMarks = round(array_sum($jokeMarks)/$marksCount, 3, PHP_ROUND_HALF_DOWN);
-                }
+                // make jokeMarks to be a joke average mark
+                $jokeMarks = round(array_sum($jokeMarks)/$marksCount, 3, PHP_ROUND_HALF_DOWN);
             }
 
             // get top-rated joke in month
-            $topRatedJokeIdPerMonth = '';
-            $maxMark = 0;
-            foreach ($marksByJoke as $jokeId => $avgMark) {
-                if ($avgMark > $maxMark) {
-                    $maxMark = $avgMark;
-                    $topRatedJokeIdPerMonth = $jokeId;
-                }
-            }
-
-            $marksByJoke = $topRatedJokeIdPerMonth;
+            // make $marksPerJoke to be an array of top rated joke IDs
+            $marksPerJoke = array_keys($marksPerJoke, max($marksPerJoke));
         }
 
         // Now $marksByJokePerMonth is array of (month => topRatedJokeId).
+        ksort($marksByJokePerMonth);
         return $marksByJokePerMonth;
     }
 }

@@ -1,15 +1,25 @@
 <?php
 
+//declare(strict_types=1);
+
 require 'vendor/autoload.php';
 
-use App\App;
+use App\Commands\{DownloadCommand, GenerateCommand, ShowCommand, StatisticsCommand};
 use Dotenv\Dotenv;
+use Symfony\Component\Console\Application;
 
 $dotenv = Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-$dotenv->required(['apiKey'])->notEmpty();
-$dotenv->required(['jokesFile'])->notEmpty();
-$dotenv->required(['personsFile'])->notEmpty();
-$dotenv->required(['marksFile'])->notEmpty();
+$dotenv->required(['RAPIDAPI_KEY'])->notEmpty();
+$dotenv->required(['JOKES_FILE'])->notEmpty();
+$dotenv->required(['PERSONS_FILE'])->notEmpty();
+$dotenv->required(['MARKS_FILE'])->notEmpty();
 
-App::run($_ENV['jokesFile'], $_ENV['personsFile'], $_ENV['marksFile']);
+$app = new Application();
+$app->add(new DownloadCommand());
+$app->add(new ShowCommand());
+$app->add(new GenerateCommand());
+$app->add(new StatisticsCommand());
+$app->run();
+
+//(new App())->run(6, $_ENV['jokesFile'], $_ENV['personsFile'], $_ENV['marksFile']);

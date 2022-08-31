@@ -20,17 +20,37 @@ class Joke implements JsonSerializable
     public function __construct(string $sourceId, string $text, ?string $category, string $source)
     {
         if (empty($sourceId)) throw new Exception('Empty id string.');
-        else $this->sourceId = $sourceId;
+        $this->sourceId = $sourceId;
 
         if (empty($text)) throw new Exception('Empty text string.');
-        else $this->text = $text;
+        $this->text = $text;
 
         $this->category = $category;
 
         if (empty($source)) throw new Exception('Empty source string.');
-        else $this->source = $source;
+        $this->source = $source;
     }
-    
+
+    public function getSourceId(): string
+    {
+        return $this->sourceId;
+    }
+
+    public function getText(): string
+    {
+        return $this->text;
+    }
+
+    public function getCategory(): ?string
+    {
+        return $this->category;
+    }
+
+    public function getSource(): string
+    {
+        return $this->source;
+    }
+
     public function jsonSerialize() : array
     {
         return [

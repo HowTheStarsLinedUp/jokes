@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use App\Statistics;
+use JsonMachine\Exception\InvalidArgumentException;
 use JsonMachine\Items;
 use JsonMachine\JsonDecoder\ExtJsonDecoder;
 use PHPUnit\Framework\TestCase;
@@ -13,14 +14,20 @@ class StatisticsTest extends TestCase
 {
     private static $exampleJson = '../marksExample.json';
 
-    /** @test */
+    /**
+     * @test
+     * @throws InvalidArgumentException
+     */
     public function getMostPopularJokeIdTest() : void
     {
         $expected = 'o-vfxwx6rgecuo_f5cecpq';
         $this->assertEquals($expected, Statistics::getMostPopularJokeId(self::$exampleJson));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws InvalidArgumentException
+     */
     public function getAvgMarkByJokeTest() : void
     {
         $expected = [
@@ -34,17 +41,23 @@ class StatisticsTest extends TestCase
             '4fmvnwfasrwmh58yjbuv1g' => 5,
         ];
 //        print_r(self::getAllMarksByJokeHelper());
-        $this->assertEquals($expected, Statistics::getAvgMarkByJoke(self::$exampleJson));
+        $this->assertEquals($expected, Statistics::getAvgMarkPerJoke(self::$exampleJson));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws InvalidArgumentException
+     */
     public function getTopRatedJokeIdTest() : void
     {
         $expected = 'cwguxfhptcuagndjdt1hya';
         $this->assertEquals($expected, Statistics::getTopRatedJokeId(self::$exampleJson));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @throws InvalidArgumentException
+     */
     public function getTopRatedJokeIdPerMonthTest() : void
     {
         $expected = [
@@ -67,6 +80,7 @@ class StatisticsTest extends TestCase
 
     /**
      * helper
+     * @throws InvalidArgumentException
      */
     private function getAllMarksByJokeHelper() : array
     {
@@ -82,6 +96,7 @@ class StatisticsTest extends TestCase
 
     /**
      * helper
+     * @throws InvalidArgumentException
      */
     private function getTopRatedJokeIdPerMonthHelper() : array
     {

@@ -3,7 +3,8 @@
         "guzzlehttp/guzzle": "^7",
         "php": "^8",
         "vlucas/phpdotenv": "^5",
-        "halaxa/json-machine": "^1.1"
+        "halaxa/json-machine": "^1.1",
+        "symfony/console": "^6.1"
     },
     "autoload": {
         "psr-4": {

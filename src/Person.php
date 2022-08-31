@@ -17,6 +17,11 @@ class Person implements JsonSerializable
         else $this->id = $id;
     }
 
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
     public function jsonSerialize() : array
     {
         return [
