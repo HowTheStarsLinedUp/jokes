@@ -1,122 +1,152 @@
 [
   {
-    "jokeId": "o-vfxwx6rgecuo_f5cecpq",
-    "authorId": "62fb756f77f5f",
-    "value": 9,
-    "timestamp": 1648961612
-  },
-  {
-    "jokeId": "o-vfxwx6rgecuo_f5cecpq",
-    "authorId": "62fb756f77f55",
-    "value": 10,
-    "timestamp": 1648768608
-  },
-  {
     "jokeId": "cwguxfhptcuagndjdt1hya",
-    "authorId": "62fb756f77f6c",
+    "authorId": "631cab810e594",
     "value": 7,
-    "timestamp": 1646866269
+    "timestamp": 1641765757
   },
   {
-    "jokeId": "nbfmksvwq3stmubxphsfbw",
-    "authorId": "62fb756f77f6d",
-    "value": 2,
-    "timestamp": 1668157179
-  },
-  {
-    "jokeId": "nbfmksvwq3stmubxphsfbw",
-    "authorId": "62fb756f77f72",
-    "value": 2,
-    "timestamp": 1655190021
-  },
-  {
-    "jokeId": "nbfmksvwq3stmubxphsfbw",
-    "authorId": "62fb756f77f76",
-    "value": 10,
-    "timestamp": 1666388043
-  },
-  {
-    "jokeId": "0gno3wclrfohs9a_mlx7rw",
-    "authorId": "62fb756f77f6e",
-    "value": 1,
-    "timestamp": 1645242164
-  },
-  {
-    "jokeId": "0gno3wclrfohs9a_mlx7rw",
-    "authorId": "62fb756f77f61",
-    "value": 9,
-    "timestamp": 1667620784
-  },
-  {
-    "jokeId": "0gno3wclrfohs9a_mlx7rw",
-    "authorId": "62fb756f77f72",
-    "value": 9,
-    "timestamp": 1643685536
-  },
-  {
-    "jokeId": "JiqrAB-RRm-xYlPafESBVw",
-    "authorId": "62fb756f77f65",
-    "value": 1,
-    "timestamp": 1663633193
-  },
-  {
-    "jokeId": "JiqrAB-RRm-xYlPafESBVw",
-    "authorId": "62fb756f77f59",
+    "jokeId": "qqu1j77sqfkr-pekzhnk_q",
+    "authorId": "631cab810e59b",
     "value": 3,
-    "timestamp": 1671797008
+    "timestamp": 1671261235
   },
   {
-    "jokeId": "0wdewlp2tz-mt_upesvrjw",
-    "authorId": "62fb756f77f5e",
+    "jokeId": "qqu1j77sqfkr-pekzhnk_q",
+    "authorId": "631cab810e599",
+    "value": 3,
+    "timestamp": 1665998195
+  },
+  {
+    "jokeId": "qqu1j77sqfkr-pekzhnk_q",
+    "authorId": "631cab810e598",
+    "value": 9,
+    "timestamp": 1649170673
+  },
+  {
+    "jokeId": "qqu1j77sqfkr-pekzhnk_q",
+    "authorId": "631cab810e57f",
+    "value": 10,
+    "timestamp": 1661365485
+  },
+  {
+    "jokeId": "OSlTqFsNTPaYcnF5HRUKlw",
+    "authorId": "631cab810e57f",
+    "value": 5,
+    "timestamp": 1652218553
+  },
+  {
+    "jokeId": "60dd35aba115ee7ff4c407dd",
+    "authorId": "631cab810e578",
     "value": 6,
-    "timestamp": 1656239156
+    "timestamp": 1644582042
   },
   {
-    "jokeId": "0wdewlp2tz-mt_upesvrjw",
-    "authorId": "62fb756f77f37",
+    "jokeId": "60dd35aba115ee7ff4c407dd",
+    "authorId": "631cab810e573",
+    "value": 4,
+    "timestamp": 1650525347
+  },
+  {
+    "jokeId": "60dd35aba115ee7ff4c407dd",
+    "authorId": "631cab810e592",
     "value": 7,
-    "timestamp": 1655804053
+    "timestamp": 1661716496
   },
   {
-    "jokeId": "o-vfxwx6rgecuo_f5cecpq",
-    "authorId": "62fb756f77f5a",
-    "value": 3,
-    "timestamp": 1643374639
-  },
-  {
-    "jokeId": "o-vfxwx6rgecuo_f5cecpq",
-    "authorId": "62fb756f77f58",
-    "value": 2,
-    "timestamp": 1656848687
-  },
-  {
-    "jokeId": "o-vfxwx6rgecuo_f5cecpq",
-    "authorId": "62fb756f77f7a",
+    "jokeId": "60dd364d7251117d2e7e98b7",
+    "authorId": "631cab810e562",
     "value": 10,
-    "timestamp": 1651507236
+    "timestamp": 1666418804
   },
   {
-    "jokeId": "zk14uc6xr82d7ig9qhaymg",
-    "authorId": "62fb756f77f71",
+    "jokeId": "60dd364d7251117d2e7e98b7",
+    "authorId": "631cab810e575",
+    "value": 2,
+    "timestamp": 1670909682
+  },
+  {
+    "jokeId": "60dd364d7251117d2e7e98b7",
+    "authorId": "631cab810e576",
+    "value": 2,
+    "timestamp": 1665143813
+  },
+  {
+    "jokeId": "60dd364d7251117d2e7e98b7",
+    "authorId": "631cab810e59e",
+    "value": 1,
+    "timestamp": 1668250960
+  },
+  {
+    "jokeId": "60dd37bdff96470c011c87cf",
+    "authorId": "631cab810e562",
+    "value": 3,
+    "timestamp": 1646545976
+  },
+  {
+    "jokeId": "60dd38021dfc729d22050fe1",
+    "authorId": "631cab810e58d",
     "value": 4,
-    "timestamp": 1647088859
+    "timestamp": 1653336122
   },
   {
-    "jokeId": "zk14uc6xr82d7ig9qhaymg",
-    "authorId": "62fb756f77f38",
-    "value": 8,
-    "timestamp": 1665610072
+    "jokeId": "60dd38021dfc729d22050fe1",
+    "authorId": "631cab810e57f",
+    "value": 9,
+    "timestamp": 1647165668
   },
   {
-    "jokeId": "4fmvnwfasrwmh58yjbuv1g",
-    "authorId": "62fb756f77f6e",
-    "value": 6,
-    "timestamp": 1660791141
+    "jokeId": "60dd38021dfc729d22050fe1",
+    "authorId": "631cab810e566",
+    "value": 7,
+    "timestamp": 1656194721
   },
   {
-    "jokeId": "4fmvnwfasrwmh58yjbuv1g",
-    "authorId": "62fb756f77f34",
-    "value": 4,
-    "timestamp": 1643938541
+    "jokeId": "60dd38021dfc729d22050fe1",
+    "authorId": "631cab810e590",
+    "value": 2,
+    "timestamp": 1666454341
+  },
+  {
+    "jokeId": "60dd37b68edad440552c291e",
+    "authorId": "631cab810e562",
+    "value": 1,
+    "timestamp": 1655580418
+  },
+  {
+    "jokeId": "60dd37b68edad440552c291e",
+    "authorId": "631cab810e58e",
+    "value": 7,
+    "timestamp": 1648663640
+  },
+  {
+    "jokeId": "60dd37b68edad440552c291e",
+    "authorId": "631cab810e57f",
+    "value": 10,
+    "timestamp": 1651615144
+  },
+  {
+    "jokeId": "60dd37b68edad440552c291e",
+    "authorId": "631cab810e568",
+    "value": 2,
+    "timestamp": 1668143968
+  },
+  {
+    "jokeId": "60dd358a37134ec38edeb820",
+    "authorId": "631cab810e599",
+    "value": 2,
+    "timestamp": 1667298312
+  },
+  {
+    "jokeId": "60dd358a37134ec38edeb820",
+    "authorId": "631cab810e591",
+    "value": 2,
+    "timestamp": 1666581252
+  },
+  {
+    "jokeId": "60dd358a37134ec38edeb820",
+    "authorId": "631cab810e59d",
+    "value": 2,
+    "timestamp": 1641008064
   }
 ]

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 
 class Joke implements JsonSerializable
@@ -51,7 +52,13 @@ class Joke implements JsonSerializable
         return $this->source;
     }
 
-    public function jsonSerialize() : array
+    #[ArrayShape([
+        'sourceId' => 'string',
+        'text' => 'string',
+        'category' => 'string',
+        'source' => 'string',
+    ])]
+    public function jsonSerialize(): array
     {
         return [
             'sourceId' => $this->sourceId,

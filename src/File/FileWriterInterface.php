@@ -6,5 +6,5 @@ namespace App\File;
 
 interface FileWriterInterface
 {
-    public function write(array $data, string $fileName) : void;
+    public function write(array $data, string $fileName): void;
 }

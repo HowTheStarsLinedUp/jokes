@@ -1,6 +1,6 @@
 <?php
 
-//declare(strict_types=1);
+declare(strict_types=1);
 
 require 'vendor/autoload.php';
 
@@ -21,5 +21,3 @@ $app->add(new ShowCommand());
 $app->add(new GenerateCommand());
 $app->add(new StatisticsCommand());
 $app->run();
-
-//(new App())->run(6, $_ENV['jokesFile'], $_ENV['personsFile'], $_ENV['marksFile']);

@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace App\File;
 
-use App\Joke;
+use Exception;
 
 class CsvWriter implements FileWriterInterface
 {
-    public function write($data, $fileName) : void
+    /**
+     * @throws Exception
+     */
+    public function write($data, $fileName): void
     {
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        if ($ext != 'csv') throw new Exception("Wrong file extension in: '$fileName'. Expected 'csv'.");
+
         $fp = fopen($fileName, 'w');
 
         foreach ($data as $fields) {

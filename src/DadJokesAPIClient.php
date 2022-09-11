@@ -34,6 +34,8 @@ class DadJokesApiClient implements JokeDownloaderInterface
      * @throws Exception
      * @throws GuzzleException
      * @throws JsonException
+     *
+     * @return Joke[]
      */
     public function downloadJokes(int $number) : array
     {
@@ -59,6 +61,8 @@ class DadJokesApiClient implements JokeDownloaderInterface
      * @throws Exception
      * @throws GuzzleException
      * @throws JsonException
+     *
+     * @return Joke[]
      */
     private function fetch(int $jokesByRequest) : array
     {

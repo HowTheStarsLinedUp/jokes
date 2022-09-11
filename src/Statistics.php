@@ -4,110 +4,114 @@ declare(strict_types=1);
 
 namespace App;
 
-use JsonException;
+use JetBrains\PhpStorm\ArrayShape;
 
 class Statistics
 {
-    private array $marks;
-
     /**
-     * @throws JsonException
+     * @return array{jokeIds: string, mark: float} Average mark per joke
      */
-    public function __construct(string $marksFile)
-    {
-        $this->marks = json_decode(file_get_contents($marksFile), true, flags: JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * Return most popular joke IDs with the highest number of marks.
-     */
-    public function getMostPopularJokeId() : array
-    {
-        $markCountersPerJokeId = [];
-        foreach ($this->marks as $mark) {
-            $jokeId = $mark['jokeId'];
-            if (array_key_exists($jokeId, $markCountersPerJokeId)) {
-                $markCountersPerJokeId[$jokeId] += 1;
-            } else {
-                $markCountersPerJokeId[$jokeId] = 1;
-            }
-        }
-
-        return array_keys($markCountersPerJokeId, max($markCountersPerJokeId));
-    }
-
-    /**
-     * Return average mark per joke
-     */
-    public function getAvgMarkPerJoke() : array
+    #[ArrayShape([
+        'jokeId' => 'string',
+        'value' => 'float',
+    ])]
+    public function getAvgMarkPerJoke(array $marks): array
     {
         $marksPerJoke = [];
-        foreach ($this->marks as $mark) {
+        foreach ($marks as $mark) {
             $marksPerJoke[ $mark['jokeId'] ][] = $mark['value'];
         }
-
         foreach ($marksPerJoke as &$jokeMarks) {
-            $marksCount = count($jokeMarks);
             // make jokeMarks to be a joke average mark
-            $jokeMarks = round(array_sum($jokeMarks)/$marksCount, 3, PHP_ROUND_HALF_DOWN);
+            $jokeMarks = (float) bcdiv( (string)array_sum($jokeMarks), (string) count($jokeMarks), 3 );
         }
 
         return $marksPerJoke;
     }
 
     /**
-     * Return the most successful joke IDs with the highest average rating.
+     * Return joke IDs with average rating lower than $num.
      */
-    public function getTopRatedJokeId() : array
+    #[ArrayShape([
+        'jokeId' => 'string',
+    ])]
+    public function getJokeIdsLowerThen(array $marks, int $limitMark): array
     {
-        $avgMarkPerJoke = $this->getAvgMarkPerJoke();
-        return array_keys($avgMarkPerJoke, max($avgMarkPerJoke));
+        return array_keys(array_filter($this->getAvgMarkPerJoke($marks), fn($markValue) => $markValue < $limitMark));
     }
 
     /**
      * Return the most low rated joke IDs with the lowest average rating.
      */
-    public function getLowRatedJokeId() : array
+    #[ArrayShape([
+        'jokeId' => 'string',
+    ])]
+    public function getLowRatedJokeIds(array $marks): array
     {
-        $avgMarkPerJoke = $this->getAvgMarkPerJoke();
+        $avgMarkPerJoke = $this->getAvgMarkPerJoke($marks);
         return array_keys($avgMarkPerJoke, min($avgMarkPerJoke));
     }
 
     /**
-     * Return joke IDs with average rating lower than $num.
+     * Return most popular joke IDs with the highest number of marks.
      */
-    public function getJokeIdsLowerThen(int $num) : array
+    #[ArrayShape([
+        'jokeId' => 'string',
+    ])]
+    public function getMostPopularJokeIds(array $marks): array
     {
-        $avgMarkPerJoke = $this->getAvgMarkPerJoke();
-        return array_keys($avgMarkPerJoke, array_filter($avgMarkPerJoke, fn($value) => $value < $num));
+        $markCounterPerJokeId = [];
+        foreach ($marks as $mark) {
+            $jokeId = $mark['jokeId'];
+            if (!isset($markCounterPerJokeId[$jokeId])) $markCounterPerJokeId[$jokeId] = 0;
+            $markCounterPerJokeId[$jokeId]++;
+        }
+        return array_keys($markCounterPerJokeId, max($markCounterPerJokeId));
     }
 
     /**
-     * Return the most successful joke with the highest average rating per month.
+     * Return the most successful joke IDs with the highest average rating.
      */
-    public function getTopRatedJokeIdPerMonth() : array
+    #[ArrayShape([
+        'jokeId' => 'string',
+    ])]
+    public function getTopRatedJokeIds(array $marks): array
+    {
+        $avgMarkPerJoke = $this->getAvgMarkPerJoke($marks);
+        return array_keys($avgMarkPerJoke, max($avgMarkPerJoke));
+    }
+
+    /**
+     * @param array $marks
+     *     $marks = [
+     *          [
+     *             'jokeId'    => (string)
+     *             'authorId'  => (string)
+     *             'value'     => (string)
+     *             'timestamp' => (int)
+     *         ]
+     *         ...
+     *     ]
+     *
+     * @return array{month: string, jokeIds: array} The most successful joke with the highest average rating per month.
+     */
+    #[ArrayShape([
+        'month' => 'int',
+        'jokeIds' => 'array',
+        ])]
+    public function getTopRatedJokeIdsPerMonth(array $marks): array
     {
         $marksByJokePerMonth = [];
-        foreach ($this->marks as $mark) {
+        foreach ($marks as $mark) {
             // [months][jokeIDs][marks]
-            $marksByJokePerMonth[ date("m", $mark['timestamp']) ][ $mark['jokeId'] ][] = $mark['value'];
+            $marksByJokePerMonth[ idate("m", $mark['timestamp']) ][] = $mark;
         }
-
         foreach ($marksByJokePerMonth as &$marksPerJoke) {
-            // get average mark for every joke in month
-            foreach ($marksPerJoke as &$jokeMarks) {
-                $marksCount = count($jokeMarks);
-                // make jokeMarks to be a joke average mark
-                $jokeMarks = round(array_sum($jokeMarks)/$marksCount, 3, PHP_ROUND_HALF_DOWN);
-            }
-
-            // get top-rated joke in month
-            // make $marksPerJoke to be an array of top rated joke IDs
-            $marksPerJoke = array_keys($marksPerJoke, max($marksPerJoke));
+            $marksPerJoke = $this->getTopRatedJokeIds($marksPerJoke);
         }
-
-        // Now $marksByJokePerMonth is array of (month => topRatedJokeId).
         ksort($marksByJokePerMonth);
+
+        // Now $marksByJokePerMonth is array of [month => topRatedJokeIds].
         return $marksByJokePerMonth;
     }
 }

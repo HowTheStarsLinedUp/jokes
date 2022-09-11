@@ -15,6 +15,8 @@ class CommandValidator
         $this->output = $output;
     }
 
+//    валідатор має тільки перевіряти валідно, не валідно. без виводу лишнього.
+
     public function count(int $number) : bool
     {
         if ($number > 250) {

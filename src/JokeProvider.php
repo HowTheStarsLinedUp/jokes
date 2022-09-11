@@ -6,6 +6,8 @@ namespace App;
 
 use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use JsonException;
 
 class JokeProvider
 {
@@ -16,19 +18,20 @@ class JokeProvider
         $this->guzzleClient = $guzzleClient;
     }
 
-    public function getJokes(int $number, string $sourceAlias) : array
+    /**
+     * @return Joke[]
+     * @throws GuzzleException
+     * @throws JsonException
+     *
+     * @throws Exception
+     */
+    public function getJokes(int $number, ApiAlias $sourceAlias): array
     {
-        if ($sourceAlias == $_ENV['CHUCKNORRIS_API_ALIAS']) {
-            $jokeDownloader = new ChuckApiClient($this->guzzleClient);
-        } elseif ($sourceAlias == $_ENV['DADJOKES_API_ALIAS']) {
-            $jokeDownloader = new DadJokesApiClient($this->guzzleClient);
-        } else {
-            if (empty($sourceAlias)) {
-                throw new Exception('Empty source.');
-            } else {
-                throw new Exception('Source is not valid.');
-            }
-        }
+        $jokeDownloader = match ($sourceAlias->value) {
+            $_ENV['CHUCKNORRIS_API_ALIAS'] => new ChuckApiClient($this->guzzleClient),
+            $_ENV['DADJOKES_API_ALIAS'] => new DadJokesApiClient($this->guzzleClient),
+            default => throw new Exception('Source is not valid.')
+        };
 
         return $jokeDownloader->downloadJokes($number);
     }

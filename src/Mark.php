@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App;
 
 use Exception;
+use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 
 class Mark implements JsonSerializable
@@ -32,6 +33,12 @@ class Mark implements JsonSerializable
         $this->timestamp = $timestamp;
     }
 
+    #[ArrayShape([
+        'jokeId' => 'string',
+        'authorId' => 'string',
+        'value' => 'string',
+        'timestamp' => 'int',
+    ])]
     public function jsonSerialize() : array
     {
         return [
