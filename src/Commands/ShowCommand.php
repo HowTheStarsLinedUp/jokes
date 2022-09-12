@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\ApiAlias;
-use App\ChuckApiClient;
-use App\DadJokesApiClient;
+use App\JokeProvider;
 use GuzzleHttp\Client;
 
 use Symfony\Component\Console\Command\Command;
@@ -36,20 +35,7 @@ class ShowCommand extends Command
     {
         $sourceAlias = ApiAlias::from($input->getOption('source'));
         $guzzleClient = new Client(['timeout' => $_ENV['GUZZLE_CLIENT_TIMEOUT']]);
-
-        switch ($sourceAlias->value) {
-            case $_ENV['CHUCKNORRIS_API_ALIAS']:
-                $jokeDownloader = new ChuckApiClient($guzzleClient);
-                break;
-            case $_ENV['DADJOKES_API_ALIAS']:
-                $jokeDownloader = new DadJokesApiClient($guzzleClient);
-                break;
-            default:
-                $output->writeln('<error>Source is not valid.</>');
-                return Command::INVALID;
-        }
-
-        $joke = $jokeDownloader->downloadJokes(1);
+        $joke = (new JokeProvider($guzzleClient))->getJokes(1, $sourceAlias);
 
         $output->writeln([
             "<info>Joke from $sourceAlias:</>",
