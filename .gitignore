@@ -6,3 +6,5 @@ vendor/
 jokes.json
 marks.json
 persons.json
+tests/jokesTest.json
+tests/marksTest.json

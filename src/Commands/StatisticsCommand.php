@@ -16,14 +16,14 @@ use Symfony\Component\Console\Style\SymfonyStyle;
  */
 class StatisticsCommand extends Command
 {
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->setName('statistics')
             ->setDescription('Shows statistics.')
-            ->addArgument('marksSrcFile', InputArgument::OPTIONAL, 'Path to marks storage file.', $_ENV['MARKS_FILE']);
+            ->addArgument('marksSrcFile', InputArgument::REQUIRED, 'Path to marks storage file.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $marksSrcFile = $input->getArgument('marksSrcFile');
         $marks = json_decode(file_get_contents($marksSrcFile), true, flags: JSON_THROW_ON_ERROR);
@@ -47,7 +47,11 @@ class StatisticsCommand extends Command
 //        print_r($stats->getJokeIdsLowerThen(3));
 
 //        $io->section('getTopRatedJokeIdPerMonth');
-        print_r($stats->getTopRatedJokeIdsPerMonth($marks));
+
+        foreach ($stats->getTopRatedJokeIdsPerMonth($marks) as $month => $id) {
+            $output->writeln((string)$month);
+            $output->writeln($id);
+        }
 
         return Command::SUCCESS;
     }

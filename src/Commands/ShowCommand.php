@@ -18,6 +18,12 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ShowCommand extends Command
 {
+    public function __construct(array $cfg, string $name = null)
+    {
+        $this->cfg = $cfg;
+        parent::__construct($name);
+    }
+
     protected function configure(): void
     {
         $this->setName('show')
@@ -27,7 +33,7 @@ class ShowCommand extends Command
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'The joke source alias. Where it comes from.',
-                $_ENV['CHUCKNORRIS_API_ALIAS']
+                $this->cfg['CHUCKNORRIS_API_ALIAS']
             );
     }
 
@@ -38,7 +44,7 @@ class ShowCommand extends Command
         $joke = (new JokeProvider($guzzleClient))->getJokes(1, $sourceAlias);
 
         $output->writeln([
-            "<info>Joke from $sourceAlias:</>",
+            "<info>Joke from $sourceAlias->value:</>",
             '<info>' . $joke[0]->getText() . '</>',
             '',
         ]);

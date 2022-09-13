@@ -18,14 +18,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class DownloadCommand extends Command
 {
-//    public function __construct(
-//        private Client $guzzleClient,
-//        string $name = null)
-//    {
-//        parent::__construct($name);
-//    }
+    private array $cfg;
 
-    protected function configure() : void
+    public function __construct(array $cfg, string $name = null)
+    {
+        $this->cfg = $cfg;
+        parent::__construct($name);
+    }
+
+    protected function configure(): void
     {
         $this->setName('download')
             ->setDescription('Downloads jokes and saves them to a file.')
@@ -34,33 +35,34 @@ class DownloadCommand extends Command
                 'c',
                 InputOption::VALUE_OPTIONAL,
                 'Number of jokes.',
+                1
             )->addOption(
                 'file',
                 'f',
                 InputOption::VALUE_OPTIONAL,
                 'File path to store jokes. You can use json or csv.',
-                $_ENV['JOKES_FILE']
+                $this->cfg['JOKES_FILE']
             )->addOption(
                 'source',
                 's',
                 InputOption::VALUE_OPTIONAL,
                 'The joke source alias. Where it comes from.',
-                $_ENV['CHUCKNORRIS_API_ALIAS']
+                $this->cfg['CHUCKNORRIS_API_ALIAS']
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $count = intval($input->getOption('count'));
         $fileName = $input->getOption('file');
         $sourceAlias = ApiAlias::from($input->getOption('source'));
 
         $valid = new CommandValidator($output);
-        if(!$valid->count($count)
+        if (!$valid->count($count)
             or !$valid->fileName($fileName)
         ) return Command::INVALID;
 
-        $guzzleClient = new Client(['timeout' => $_ENV['GUZZLE_CLIENT_TIMEOUT']]);
+        $guzzleClient = new Client(['timeout' => $this->cfg['GUZZLE_CLIENT_TIMEOUT']]);
         $jokeProvider = new JokeProvider($guzzleClient);
         $jokes = $jokeProvider->getJokes($count, $sourceAlias);
         (new FileWriter)->write($jokes, $fileName);

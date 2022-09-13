@@ -26,7 +26,7 @@ class Mark implements JsonSerializable
         if (empty($authorId)) throw new Exception('Empty authorId string.');
         $this->authorId = $authorId;
 
-        if ($value < 1 or $value > 10) throw new Exception('Mark out of range 1-10.');
+        if ($value < 1) throw new Exception('Mark cannot be negative.');
         $this->value = $value;
 
         if ($timestamp < 0) throw new Exception('Timestamp must be greater than zero.');
