@@ -31,13 +31,13 @@ class DadJokesApiClient implements JokeDownloaderInterface
     }
 
     /**
-     * @throws Exception
+     * @return Joke[]
      * @throws GuzzleException
      * @throws JsonException
      *
-     * @return Joke[]
+     * @throws Exception
      */
-    public function downloadJokes(int $number) : array
+    public function downloadJokes(int $number): array
     {
         if ($number > 250) {
             throw new Exception('Too many jokes. Max 250.');
@@ -58,13 +58,13 @@ class DadJokesApiClient implements JokeDownloaderInterface
     }
 
     /**
-     * @throws Exception
+     * @return Joke[]
      * @throws GuzzleException
      * @throws JsonException
      *
-     * @return Joke[]
+     * @throws Exception
      */
-    private function fetch(int $jokesByRequest) : array
+    private function fetch(int $jokesByRequest): array
     {
         if ($jokesByRequest > 5) throw new Exception('Too many jokes. Max 5.');
 

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
-use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use JetBrains\PhpStorm\ArrayShape;
 use JsonException;
 
 class ChuckApiClient implements JokeDownloaderInterface
@@ -30,15 +28,10 @@ class ChuckApiClient implements JokeDownloaderInterface
     /**
      * Return array of random jokes from random categories.
      *
-     * @throws Exception
+     * @return Joke[]
      * @throws GuzzleException
      * @throws JsonException
-     *
-     * @return Joke[]
      */
-    #[ArrayShape([
-//        'index' => 'Joke',
-    ])]
     public function downloadJokes(int $number): array
     {
         $jokes = [];

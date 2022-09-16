@@ -56,16 +56,31 @@ class GenerateCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $personCount = intval($input->getArgument('personCount'));
-        $maxMarksPerJoke = intval($input->getArgument('maxMarksPerJoke'));
+        $personCount = (int)$input->getArgument('personCount');
+        $maxMarksPerJoke = (int)$input->getArgument('maxMarksPerJoke');
         $jokesSrcFile = $input->getArgument('jokesSrcFile');
         $fromDate = $input->getArgument('fromDate');
         $toDate = $input->getArgument('toDate');
         $maxMarkValue = $input->getOption('maxMark');
         $marksDestFile = $input->getOption('file');
-        $valid = new CommandValidator($output);
 
-        if (!$valid->date($fromDate) or !$valid->date($toDate)) return Command::INVALID;
+        $validator = new CommandValidator();
+        $errors[] = $validator->checkPersonCount($personCount);
+        $errors[] = $validator->checkMaxMarksPerJoke($maxMarksPerJoke);
+        $errors[] = $validator->checkSrcFile($jokesSrcFile);
+        $errors[] = $validator->checkDate($fromDate);
+        $errors[] = $validator->checkDate($toDate);
+        $errors[] = $validator->checkMaxMarkValue($maxMarkValue);
+        $errors[] = $validator->checkFileName($marksDestFile);
+        $errorFlag = false;
+        foreach ($errors as $error)
+            if ($error) {
+                $output->writeln("<error>$error</>");
+                $errorFlag = true;
+            }
+
+        if ($errorFlag) return Command::INVALID;
+
         $fromTimestamp = strtotime($fromDate);
         $toTimestamp = strtotime(date('Y-m-t', strtotime($toDate)));
 

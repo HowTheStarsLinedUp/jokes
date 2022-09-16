@@ -4,70 +4,49 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 class CommandValidator
 {
-    private OutputInterface $output;
-
-    public function __construct(OutputInterface $output)
+    public function checkCount(int $count): bool|string
     {
-        $this->output = $output;
+        return ($count > 250 or $count < 1) ? "Command invalid. 'count' must be above 1 and lower then 251".PHP_EOL : false;
     }
 
-    public function count(int $number): bool
+    public function checkDate(string $date): bool|string
     {
-        if ($number > 250) {
-            $this->output->writeln('<error>To many jokes. Max 250.</>');
-            return false;
-        }
-
-        return true;
+        // format yyyy-mm: "2012-12"
+        return (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])$/", $date)) ? false : "Command invalid. Date format must be 'yyyy-mm' like '2022-08'.".PHP_EOL;
     }
 
-    public function date(string $date): bool
+    public function checkFileName(string $fileName): bool|string
     {
-        // format Y-m: "2012-09"
-        if (!preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])$/", $date)) {
-            $this->output->writeln('<error>Wrong date format. Must be like "2012-09".</>');
-            return false;
-        }
-
-        return true;
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        return ($ext == 'json' or $ext == 'csv') ? false : "Command invalid. File extension must be 'json' or 'csv'.".PHP_EOL;
     }
 
-    public function fileName(string $fileName): bool
+    public function checkSrcFile(string $jokesSrcFile): bool|string
     {
-        $folders = explode('/', $fileName);
-        $fileName = array_pop($folders);
-
-        if (!(strpos($fileName, "."))) return false;
-
-        $path = '';
-        foreach ($folders as $folder) {
-            if ($folder == '.') {
-                $path .= $folder;
-                continue;
-            }
-            $path .= "/$folder";
-            if (!is_dir($path)) mkdir($path);
-        }
-
-        return true;
+        return (file_exists($jokesSrcFile)) ? false : "Command invalid. File does not exist: '$jokesSrcFile'".PHP_EOL;
     }
 
-    public function source(string $sourceAlias): bool
+    public function checkMaxMarksPerJoke(int $maxMarksPerJoke): bool|string
     {
-        if ($sourceAlias == $_ENV['CHUCKNORRIS_API_ALIAS'] or $sourceAlias == $_ENV['DADJOKES_API_ALIAS']) {
-            return true;
-        }
+        return ($maxMarksPerJoke < 1) ? "Command invalid. 'maxMarksPerJoke' must be 1 or above.".PHP_EOL : false;
+    }
 
-        if (empty($sourceAlias)) {
-            $this->output->writeln('<error>Empty source.</>');
-        } else {
-            $this->output->writeln('<error>Source is not valid.</>');
-        }
+    public function checkMaxMarkValue(int $maxMarkValue): bool|string
+    {
+        return ($maxMarkValue > 100 or $maxMarkValue < 1) ? "Command invalid. 'maxMarkValue' must be above 1 and lower then 101".PHP_EOL : false;
+    }
 
-        return false;
+    public function checkPersonCount(int $personCount): bool|string
+    {
+        return ($personCount < 1) ? "Command invalid. 'personCount' must be 1 or above.".PHP_EOL : false;
+    }
+
+    public function checkSource(string $sourceAlias, array $cfg): bool|string
+    {
+        return ($sourceAlias == $cfg['CHUCKNORRIS_API_ALIAS'] or $sourceAlias == $_ENV['DADJOKES_API_ALIAS']) ?
+            false :
+            "Command invalid. Source must be '".$cfg['CHUCKNORRIS_API_ALIAS']."' or '".$_ENV['DADJOKES_API_ALIAS']."'.".PHP_EOL;
     }
 }

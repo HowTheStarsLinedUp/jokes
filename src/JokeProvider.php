@@ -25,14 +25,13 @@ class JokeProvider
      *
      * @throws Exception
      */
-    public function getJokes(int $number, ApiAlias $sourceAlias): array
+    public function getJokes(int $number, string $sourceAlias, array $cfg): array
     {
-        $jokeDownloader = match ($sourceAlias->value) {
-            $_ENV['CHUCKNORRIS_API_ALIAS'] => new ChuckApiClient($this->guzzleClient),
-            $_ENV['DADJOKES_API_ALIAS'] => new DadJokesApiClient($this->guzzleClient),
-            default => throw new Exception('Source is not valid.')
+        $jokeApiClient = match ($sourceAlias) {
+            $cfg['CHUCKNORRIS_API_ALIAS'] => new ChuckApiClient($this->guzzleClient),
+            $cfg['DADJOKES_API_ALIAS'] => new DadJokesApiClient($this->guzzleClient)
         };
 
-        return $jokeDownloader->downloadJokes($number);
+        return $jokeApiClient->downloadJokes($number);
     }
 }

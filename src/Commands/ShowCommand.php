@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
-use App\ApiAlias;
 use App\JokeProvider;
 use GuzzleHttp\Client;
-
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\{Command\Command, Input\InputInterface, Input\InputOption, Output\OutputInterface};
 
 /**
  *  example: php ./index.php show -s chucknorris
  */
 class ShowCommand extends Command
 {
+    private array $cfg;
+
     public function __construct(array $cfg, string $name = null)
     {
         $this->cfg = $cfg;
@@ -39,12 +36,24 @@ class ShowCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $sourceAlias = ApiAlias::from($input->getOption('source'));
-        $guzzleClient = new Client(['timeout' => $_ENV['GUZZLE_CLIENT_TIMEOUT']]);
-        $joke = (new JokeProvider($guzzleClient))->getJokes(1, $sourceAlias);
+        $sourceAlias = $input->getOption('source');
+
+        $validator = new CommandValidator();
+        $errors[] = $validator->checkSource($sourceAlias, $this->cfg);
+        $errorFlag = false;
+        foreach ($errors as $error)
+            if ($error) {
+                $output->writeln("<error>$error</>");
+                $errorFlag = true;
+            }
+
+        if ($errorFlag) return Command::INVALID;
+
+        $guzzleClient = new Client(['timeout' => $this->cfg['GUZZLE_CLIENT_TIMEOUT']]);
+        $joke = (new JokeProvider($guzzleClient))->getJokes(1, $sourceAlias, $this->cfg);
 
         $output->writeln([
-            "<info>Joke from $sourceAlias->value:</>",
+            "<info>Joke from $sourceAlias:</>",
             '<info>' . $joke[0]->getText() . '</>',
             '',
         ]);

@@ -6,5 +6,5 @@ namespace App;
 
 interface JokeDownloaderInterface
 {
-    public function downloadJokes(int $number) : array;
+    public function downloadJokes(int $number): array;
 }

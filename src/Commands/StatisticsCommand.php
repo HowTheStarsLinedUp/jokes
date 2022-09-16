@@ -26,6 +26,19 @@ class StatisticsCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $marksSrcFile = $input->getArgument('marksSrcFile');
+
+        $validator = new CommandValidator();
+        $errors[] = $validator->checkSrcFile($marksSrcFile);
+        $errorFlag = false;
+        foreach ($errors as $error)
+            if ($error) {
+                $output->writeln("<error>$error</>");
+                $errorFlag = true;
+            }
+
+        if ($errorFlag) return Command::INVALID;
+
+
         $marks = json_decode(file_get_contents($marksSrcFile), true, flags: JSON_THROW_ON_ERROR);
         $stats = new Statistics();
 

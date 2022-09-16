@@ -1,8 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<phpunit colors='true' bootstrap='vendor/autoload.php'>
+<phpunit
+        colors='true'
+        bootstrap='vendor/autoload.php'
+        cacheResult='false'
+        convertErrorsToExceptions='true'
+        convertNoticesToExceptions='true'
+        convertWarningsToExceptions='true'
+>
     <testsuites>
         <testsuite name='Unit tests'>
-            <directory>tests/Unit</directory>
+            <directory>./tests/Unit</directory>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -8,7 +8,7 @@ use App\File\MarkReader;
 use App\Mark;
 use PHPUnit\Framework\TestCase;
 
-class MarkReaderRead extends TestCase
+class MarkReaderTest extends TestCase
 {
     private array $actualMarksArray;
     private int $expectedMarksCount = 25;

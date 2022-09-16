@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
-use App\ApiAlias;
 use App\File\FileWriter;
 use App\JokeProvider;
 use GuzzleHttp\Client;
@@ -53,18 +52,26 @@ class DownloadCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $count = intval($input->getOption('count'));
+        $count = (int)$input->getOption('count');
         $fileName = $input->getOption('file');
-        $sourceAlias = ApiAlias::from($input->getOption('source'));
+        $sourceAlias = $input->getOption('source');
 
-        $valid = new CommandValidator($output);
-        if (!$valid->count($count)
-            or !$valid->fileName($fileName)
-        ) return Command::INVALID;
+        $validator = new CommandValidator();
+        $errors[] = $validator->checkCount($count);
+        $errors[] = $validator->checkFileName($fileName);
+        $errors[] = $validator->checkSource($sourceAlias, $this->cfg);
+        $errorFlag = false;
+        foreach ($errors as $error)
+            if ($error) {
+                $output->writeln("<error>$error</>");
+                $errorFlag = true;
+            }
+
+        if ($errorFlag) return Command::INVALID;
 
         $guzzleClient = new Client(['timeout' => $this->cfg['GUZZLE_CLIENT_TIMEOUT']]);
         $jokeProvider = new JokeProvider($guzzleClient);
-        $jokes = $jokeProvider->getJokes($count, $sourceAlias);
+        $jokes = $jokeProvider->getJokes($count, $sourceAlias, $this->cfg);
         (new FileWriter)->write($jokes, $fileName);
 
         return Command::SUCCESS;

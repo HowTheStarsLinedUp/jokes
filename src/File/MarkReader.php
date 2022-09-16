@@ -15,7 +15,7 @@ class MarkReader
         $reader = match ($ext) {
             'json' => new JsonReader(),
             'csv' => new CsvReader(),
-            default => throw new Exception("Wrong file extension in: '$fileName'.")
+            default => throw new Exception("Wrong file extension in: '$fileName'. Only json or csv are accepted.")
         };
         $marks = $reader->read($fileName);
         foreach ($marks as &$mark)

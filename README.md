@@ -11,9 +11,10 @@ File path to store jokes. You can use json or csv.<br>
 Default 'PROJECT_ROOT/jokes.json'.<br>
 Can be configured in the configuration .env file.<br><br>
 **-s, --source**<br>
-The joke source alias. Where it comes from.<br>
-Default 'chucknorris' or 'dadjokes'.<br>
-Can be configured in the configuration .env file.<br>
+The joke source API alias. Where it comes from.<br>
+Can be 'chucknorris' or 'dadjokes'.<br>
+Default 'chucknorris'.<br>
+Can be configured in the configuration .env file.
 ### Example:
 ```php
 php ./index.php download
@@ -50,8 +51,9 @@ php ./index.php generate 100 10 ./tests/jokesExample.json '2022-01' '2022-12' -m
 Downloads joke and print it to console.
 ### Options:
 **-s, --source**<br>
-The joke source alias. Where it comes from.<br>
-Default 'chucknorris.
+The joke source API alias. Where it comes from.<br>
+Can be 'chucknorris' or 'dadjokes'.<br>
+Default 'chucknorris'.<br>
 Can be configured in the configuration .env file.
 ### Example:
 ```php
