@@ -8,9 +8,6 @@ use JetBrains\PhpStorm\ArrayShape;
 
 class Statistics
 {
-    /**
-     * @return array{jokeIds: string, mark: float} Average mark per joke
-     */
     #[ArrayShape([
         'jokeId' => 'string',
         'value' => 'float',
@@ -19,17 +16,18 @@ class Statistics
     {
         $marksPerJoke = [];
         foreach ($marks as $mark) {
-            $marksPerJoke[ $mark['jokeId'] ][] = $mark['value'];
+            $marksPerJoke[$mark['jokeId']][] = $mark['value'];
         }
         foreach ($marksPerJoke as &$jokeMarks) {
-            // make jokeMarks to be a joke average mark
-            $jokeMarks = (float) bcdiv( (string)array_sum($jokeMarks), (string) count($jokeMarks), 3 );
+            // $marksPerJoke will be like [jokeId => averageMark]
+            $jokeMarks = (float)bcdiv((string)array_sum($jokeMarks), (string)count($jokeMarks), 3);
         }
 
         return $marksPerJoke;
     }
 
     /**
+     * @param Mark[] $marks
      * Return joke IDs with average rating lower than $num.
      */
     #[ArrayShape([
@@ -98,13 +96,13 @@ class Statistics
     #[ArrayShape([
         'month' => 'int',
         'jokeIds' => 'array',
-        ])]
+    ])]
     public function getTopRatedJokeIdsPerMonth(array $marks): array
     {
         $marksByJokePerMonth = [];
         foreach ($marks as $mark) {
             // [months][jokeIDs][marks]
-            $marksByJokePerMonth[ idate("m", $mark['timestamp']) ][] = $mark;
+            $marksByJokePerMonth[idate("m", $mark['timestamp'])][] = $mark;
         }
         foreach ($marksByJokePerMonth as &$marksPerJoke) {
             $marksPerJoke = $this->getTopRatedJokeIds($marksPerJoke);

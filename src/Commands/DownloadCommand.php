@@ -6,7 +6,9 @@ namespace App\Commands;
 
 use App\File\FileWriter;
 use App\JokeProvider;
+use Exception;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -59,6 +61,7 @@ class DownloadCommand extends Command
         $validator = new CommandValidator();
         $errors[] = $validator->checkCount($count);
         $errors[] = $validator->checkFileName($fileName);
+        $errors[] = $validator->checkFileExist($fileName);
         $errors[] = $validator->checkSource($sourceAlias, $this->cfg);
         $errorFlag = false;
         foreach ($errors as $error)
@@ -70,9 +73,14 @@ class DownloadCommand extends Command
         if ($errorFlag) return Command::INVALID;
 
         $guzzleClient = new Client(['timeout' => $this->cfg['GUZZLE_CLIENT_TIMEOUT']]);
-        $jokeProvider = new JokeProvider($guzzleClient);
-        $jokes = $jokeProvider->getJokes($count, $sourceAlias, $this->cfg);
-        (new FileWriter)->write($jokes, $fileName);
+
+        try {
+            $jokes = (new JokeProvider($guzzleClient))->getJokes($count, $sourceAlias, $this->cfg);
+            (new FileWriter)->write($jokes, $fileName);
+        } catch (Exception|GuzzleException $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</>');
+            return Command::FAILURE;
+        }
 
         return Command::SUCCESS;
     }

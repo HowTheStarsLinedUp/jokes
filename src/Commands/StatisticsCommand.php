@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
+use App\File\FileReader;
+use App\Mark;
 use App\Statistics;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,7 +31,8 @@ class StatisticsCommand extends Command
         $marksSrcFile = $input->getArgument('marksSrcFile');
 
         $validator = new CommandValidator();
-        $errors[] = $validator->checkSrcFile($marksSrcFile);
+        $errors[] = $validator->checkFileName($marksSrcFile);
+        $errors[] = $validator->checkFileExist($marksSrcFile);
         $errorFlag = false;
         foreach ($errors as $error)
             if ($error) {
@@ -38,29 +42,33 @@ class StatisticsCommand extends Command
 
         if ($errorFlag) return Command::INVALID;
 
+        try {
+            $marks = (new FileReader())->read($marksSrcFile);
+        } catch (Exception $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</>');
+            return Command::FAILURE;
+        }
 
-        $marks = json_decode(file_get_contents($marksSrcFile), true, flags: JSON_THROW_ON_ERROR);
         $stats = new Statistics();
 
-//        $io = new SymfonyStyle($input, $output);
-//        $io->title('Statistics.');
-//        $io->section('getMostPopularJokeId');
-//        print_r($stats->getMostPopularJokeId());
-//
-//        $io->section('getAvgMarkPerJoke');
-//        print_r($stats->getAvgMarkPerJoke());
-//
-//        $io->section('getTopRatedJokeId');
-//        print_r($stats->getTopRatedJokeIds());
-//
-//        $io->section('getLowRatedJokeId');
-//        print_r($stats->getLowRatedJokeIds());
-//
-//        $io->section('getJokeIdsLowerThen 3');
-//        print_r($stats->getJokeIdsLowerThen(3));
+        $io = new SymfonyStyle($input, $output);
+        $io->title('Statistics.');
+        $io->section('getMostPopularJokeIds');
+        print_r($stats->getMostPopularJokeIds($marks));
 
-//        $io->section('getTopRatedJokeIdPerMonth');
+        $io->section('getAvgMarkPerJoke');
+        print_r($stats->getAvgMarkPerJoke($marks));
 
+        $io->section('getTopRatedJokeIds');
+        print_r($stats->getTopRatedJokeIds($marks));
+
+        $io->section('getLowRatedJokeIds');
+        print_r($stats->getLowRatedJokeIds($marks));
+
+        $io->section('getJokeIdsLowerThen 3');
+        print_r($stats->getJokeIdsLowerThen($marks, 3));
+
+        $io->section('getTopRatedJokeIdPerMonth');
         foreach ($stats->getTopRatedJokeIdsPerMonth($marks) as $month => $id) {
             $output->writeln((string)$month);
             $output->writeln($id);

@@ -33,6 +33,16 @@ class Mark implements JsonSerializable
         $this->timestamp = $timestamp;
     }
 
+    public function getJokeId(): string
+    {
+        return $this->jokeId;
+    }
+
+    public function getValue(): int
+    {
+        return $this->value;
+    }
+
     #[ArrayShape([
         'jokeId' => 'string',
         'authorId' => 'string',

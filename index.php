@@ -15,4 +15,8 @@ $app->add(new DownloadCommand($_ENV));
 $app->add(new ShowCommand($_ENV));
 $app->add(new GenerateCommand($_ENV));
 $app->add(new StatisticsCommand());
-$app->run();
+try {
+    $app->run();
+} catch (Exception $e) {
+    echo $e->getMessage();
+}

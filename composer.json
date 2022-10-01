@@ -3,7 +3,6 @@
         "guzzlehttp/guzzle": "^7",
         "php": "^8.1",
         "vlucas/phpdotenv": "^5",
-        "halaxa/json-machine": "^1.1",
         "symfony/console": "^6.1",
         "ext-bcmath": "*"
     },

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App;
 
+use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
 
 class ChuckApiClient implements JokeDownloaderInterface
 {
-    public const CHUCKNORRIS_SOURCE = 'chucknorris.io';
-
+    private const CHUCKNORRIS_SOURCE = 'chucknorris.io';
     private Client $client;
     private array $options;
 
@@ -26,11 +26,10 @@ class ChuckApiClient implements JokeDownloaderInterface
     }
 
     /**
-     * Return array of random jokes from random categories.
-     *
-     * @return Joke[]
+     * @return Joke[] Array of random jokes from random categories.
      * @throws GuzzleException
      * @throws JsonException
+     * @throws Exception
      */
     public function downloadJokes(int $number): array
     {
@@ -38,17 +37,13 @@ class ChuckApiClient implements JokeDownloaderInterface
         $response = $this->client->request('GET', 'https://api.chucknorris.io/jokes/categories', $this->options);
         $categories = json_decode($response->getBody()->getContents(), true, flags: JSON_THROW_ON_ERROR);
 
-        $catNum = 0;
         $catLen = count($categories);
         for ($i = 0; $i < $number; $i++) {
+            $catNum = random_int(0, $catLen - 1);
             $url = 'https://api.chucknorris.io/jokes/random?category=' . $categories[$catNum];
             $response = $this->client->request('GET', $url, $this->options);
             $joke = json_decode($response->getBody()->getContents(), true, flags: JSON_THROW_ON_ERROR);
             $jokes[] = new Joke($joke['id'], $joke['value'], $categories[$catNum], ChuckApiClient::CHUCKNORRIS_SOURCE);
-
-            if (++$catNum == $catLen) {
-                $catNum = 0;
-            }
         }
 
         return $jokes;

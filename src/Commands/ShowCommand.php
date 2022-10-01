@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use App\JokeProvider;
+use Exception;
 use GuzzleHttp\Client;
 use Symfony\Component\Console\{Command\Command, Input\InputInterface, Input\InputOption, Output\OutputInterface};
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  *  example: php ./index.php show -s chucknorris
@@ -50,7 +52,13 @@ class ShowCommand extends Command
         if ($errorFlag) return Command::INVALID;
 
         $guzzleClient = new Client(['timeout' => $this->cfg['GUZZLE_CLIENT_TIMEOUT']]);
-        $joke = (new JokeProvider($guzzleClient))->getJokes(1, $sourceAlias, $this->cfg);
+
+        try {
+            $joke = (new JokeProvider($guzzleClient))->getJokes(1, $sourceAlias, $this->cfg);
+        } catch (Exception|GuzzleException $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</>');
+            return Command::FAILURE;
+        }
 
         $output->writeln([
             "<info>Joke from $sourceAlias:</>",

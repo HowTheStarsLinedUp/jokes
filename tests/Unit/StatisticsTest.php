@@ -10,12 +10,11 @@ use PHPUnit\Framework\TestCase;
 class StatisticsTest extends TestCase
 {
     private Statistics $stats;
-    private $marks;
+    private array $marks;
 
     protected function setUp(): void
     {
         $this->stats = new Statistics();
-//        $this->marks = json_decode(file_get_contents('./tests/marksExample.json'), true, flags: JSON_THROW_ON_ERROR);
         $this->marks = $this->provideMarksData();
     }
 

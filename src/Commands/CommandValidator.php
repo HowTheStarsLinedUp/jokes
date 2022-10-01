@@ -19,17 +19,17 @@ class CommandValidator
             false : "Command invalid. Date format must be 'yyyy-mm' like '2022-08'." . PHP_EOL;
     }
 
+    public function checkFileExist(string $fileName): bool|string
+    {
+        return (file_exists($fileName)) ?
+            false : "Error. File not found: '$fileName'." . PHP_EOL;
+    }
+
     public function checkFileName(string $fileName): bool|string
     {
         $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-        return ($ext == 'json' or $ext == 'csv') ?
+        return ($ext === 'json' or $ext === 'csv') ?
             false : "Command invalid. File extension must be 'json' or 'csv'." . PHP_EOL;
-    }
-
-    public function checkSrcFile(string $srcFile): bool|string
-    {
-        return (file_exists($srcFile)) ?
-            false : "Command invalid. File does not exist: '$srcFile'" . PHP_EOL;
     }
 
     public function checkMaxMarksPerJoke(int $maxMarksPerJoke): bool|string
@@ -52,7 +52,7 @@ class CommandValidator
 
     public function checkSource(string $sourceAlias, array $cfg): bool|string
     {
-        return ($sourceAlias == $cfg['CHUCKNORRIS_API_ALIAS'] or $sourceAlias == $cfg['DADJOKES_API_ALIAS']) ?
+        return ($sourceAlias === $cfg['CHUCKNORRIS_API_ALIAS'] or $sourceAlias === $cfg['DADJOKES_API_ALIAS']) ?
             false :
             "Command invalid. Source must be '" . $cfg['CHUCKNORRIS_API_ALIAS'] .
             "' or '" . $cfg['DADJOKES_API_ALIAS'] . "'." . PHP_EOL;

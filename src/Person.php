@@ -12,10 +12,13 @@ class Person implements JsonSerializable
 {
     private string $id;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(string $id)
     {
-        if (empty($id)) throw new Exception('Empty id string.');
-        else $this->id = $id;
+        if (empty($id)) throw new Exception('Error. Empty id string.');
+        $this->id = $id;
     }
 
     public function getId(): string

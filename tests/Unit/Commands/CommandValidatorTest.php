@@ -1,6 +1,8 @@
 <?php
 
-namespace Commands;
+declare(strict_types=1);
+
+namespace Unit\Commands;
 
 use App\Commands\CommandValidator;
 use PHPUnit\Framework\TestCase;
@@ -71,18 +73,18 @@ class CommandValidatorTest extends TestCase
     }
 
     /**
-     * @dataProvider checkSrcFileDataProvider
+     * @dataProvider checkFileExistDataProvider
      */
-    public function testCheckSrcFile(string $srcFile, bool|string $expected)
+    public function testCheckFileExist(string $fileName, bool|string $expected)
     {
-        $this->assertEquals($expected, $this->validator->checkSrcFile($srcFile));
+        $this->assertEquals($expected, $this->validator->checkFileExist($fileName));
     }
 
-    public function checkSrcFileDataProvider(): array
+    public function checkFileExistDataProvider(): array
     {
         return [
             'file exist' => ['tests/jokesExample.json', false],
-            'file not exist' => ['some/file.csv', "Command invalid. File does not exist: 'some/file.csv'" . PHP_EOL],
+            'file not exist' => ['some/file.csv', "Error. File not found: 'some/file.csv'." . PHP_EOL],
         ];
     }
 

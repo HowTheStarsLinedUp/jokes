@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Commands;
 
+use App\File\FileReader;
 use App\File\FileWriter;
 use App\Mark;
 use App\Person;
-use JsonMachine\Items;
-use JsonMachine\JsonDecoder\ExtJsonDecoder;
+use Exception;
 use Symfony\Component\Console\{
     Command\Command,
     Input\InputArgument,
@@ -67,7 +67,8 @@ class GenerateCommand extends Command
         $validator = new CommandValidator();
         $errors[] = $validator->checkPersonCount($personCount);
         $errors[] = $validator->checkMaxMarksPerJoke($maxMarksPerJoke);
-        $errors[] = $validator->checkSrcFile($jokesSrcFile);
+        $errors[] = $validator->checkFileName($jokesSrcFile);
+        $errors[] = $validator->checkFileExist($jokesSrcFile);
         $errors[] = $validator->checkDate($fromDate);
         $errors[] = $validator->checkDate($toDate);
         $errors[] = $validator->checkMaxMarkValue($maxMarkValue);
@@ -83,30 +84,34 @@ class GenerateCommand extends Command
 
         $fromTimestamp = strtotime($fromDate);
         $toTimestamp = strtotime(date('Y-m-t', strtotime($toDate)));
-
         $persons = [];
-        for ($i = 0; $i < $personCount; $i++) {
-            $persons[] = new Person(uniqid());
-        }
-
-        $jokes = Items::fromFile($jokesSrcFile, ['decoder' => new ExtJsonDecoder(true)]);
-        $personsCount = count($persons);
-        $marks = [];
-
-        foreach ($jokes as $joke) {
-            $marksCount = random_int(0, $maxMarksPerJoke);
-            for ($i = 0; $i < $marksCount; $i++) {
-                $marks[] = new Mark(
-                    $joke['sourceId'],
-                    $persons[random_int(0, $personsCount - 1)]->getId(),
-                    random_int(1, $maxMarkValue),
-                    random_int($fromTimestamp, $toTimestamp),
-                );
+        try {
+            for ($i = 0; $i < $personCount; $i++) {
+                $persons[] = new Person(uniqid());
             }
+
+            $jokes = (new FileReader())->read($jokesSrcFile);
+            $personsCount = count($persons);
+            $marks = [];
+
+            foreach ($jokes as $joke) {
+                $marksCount = random_int(0, $maxMarksPerJoke);
+                for ($i = 0; $i < $marksCount; $i++) {
+                    $marks[] = new Mark(
+                        $joke['sourceId'],
+                        $persons[random_int(0, $personsCount - 1)]->getId(),
+                        random_int(1, $maxMarkValue),
+                        random_int($fromTimestamp, $toTimestamp),
+                    );
+                }
+            }
+
+            (new FileWriter())->write($marks, $marksDestFile);
+
+        } catch (Exception $e) {
+            $output->writeln('<error>' . $e->getMessage() . '</>');
+            return Command::FAILURE;
         }
-
-        (new FileWriter())->write($marks, $marksDestFile);
-
         return Command::SUCCESS;
     }
 }
